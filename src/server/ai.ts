@@ -74,93 +74,111 @@ Now rewrite the transcript above:`;
 
 /**
  * Elite newsletter prompt - generates high-value, actionable newsletters.
+ * CRITICAL: This prompt MUST produce properly formatted markdown with clear visual separation.
  */
 function createNewsletterPrompt(videoData: any, rewrittenContent: string): string {
   const durationMinutes = Math.floor(
     Number.parseInt(videoData.duration, 10) / SECONDS_PER_MINUTE
   );
 
-  return `You are an elite newsletter writer who transforms raw content into compelling, high-value newsletters that readers eagerly anticipate. Your writing synthesizes the best qualities of world-class newsletter writers: the tactical depth of Lenny Rachitsky, the wisdom density of James Clear, the clarity of Sahil Bloom, the philosophical insight of Naval Ravikant, and the analytical storytelling of Packy McCormick.
-
-## YOUR CORE MISSION
-
-Transform the provided content into a newsletter that:
-- Readers would pay money to receive
-- Gets forwarded to colleagues and friends
-- Provides immediate, actionable value
-- Respects every second of reader time
-- Makes complex ideas simple and memorable
+  return `You are an elite newsletter writer. Transform the content below into a beautifully formatted newsletter.
 
 ---
 
-**Video Information:**
-- Title: ${videoData.title}
-- Author: ${videoData.author}
-- Duration: ${durationMinutes} minutes
+**Video:** ${videoData.title} by ${videoData.author} (${durationMinutes} min)
 
-**Content (cleaned transcript):**
+**Content:**
 ${rewrittenContent}
 
 ---
 
-## CRITICAL OUTPUT RULES
+## CRITICAL FORMATTING RULES (MUST FOLLOW EXACTLY)
 
-1. **FORMAT**: Output in clean Markdown format with proper headers (##, ###), bold (**text**), and bullet points (-)
-2. **HOOK**: Start with 1-3 sentences that grab attention immediately - NO generic openings
-3. **LENGTH**: 600-1000 words - cut ruthlessly, every sentence must earn its place
-4. **VOICE**: Write like explaining to a smart friend over coffee - conversational but authoritative
-5. **SPECIFICS**: Use concrete numbers, names, and examples - never vague language
+1. **USE MARKDOWN HEADERS**: Every section MUST start with \`## Header Name\` (with the ## symbols)
+2. **BLANK LINES ARE MANDATORY**: Put TWO blank lines before every ## header
+3. **SHORT PARAGRAPHS**: Maximum 2-3 sentences per paragraph
+4. **BLANK LINE BETWEEN PARAGRAPHS**: Every paragraph must have a blank line after it
+5. **BULLET POINTS**: Use \`- \` for lists, with blank line before and after the list
 
-## NEWSLETTER STRUCTURE
+## EXACT OUTPUT FORMAT (COPY THIS STRUCTURE)
 
-**Subject Line:** [6-10 words, creates curiosity, promises specific value]
+**Subject:** [Compelling 6-10 word subject line]
 
----
 
-[HOOK - 1-3 punchy sentences that grab attention]
+[Opening hook - 1-2 punchy sentences that grab attention]
 
-[CONTEXT - 2-4 sentences on why this matters NOW]
+[Why this matters - 2-3 sentences of context]
 
-## [Descriptive Subhead 1]
 
-[Core insight with specific example - 3-5 sentences]
+## [First Major Insight - Descriptive Title]
 
-## [Descriptive Subhead 2]
+[First paragraph about this topic - 2-3 sentences max]
 
-[More insights with specifics - 3-5 sentences or bullets]
+[Second paragraph with specific example or data - 2-3 sentences]
 
-## [Descriptive Subhead 3]
 
-[Continue pattern - 3-5 sentences or bullets]
+## [Second Major Insight - Descriptive Title]
+
+[Explanation paragraph - 2-3 sentences]
+
+[Supporting details or example - 2-3 sentences]
+
+
+## [Third Major Insight - Descriptive Title]
+
+[Key points about this insight - 2-3 sentences]
+
 
 ## Key Takeaways
 
-- [Specific, actionable insight 1]
-- [Specific, actionable insight 2]
-- [Specific, actionable insight 3]
+- [Specific actionable insight #1]
+
+- [Specific actionable insight #2]
+
+- [Specific actionable insight #3]
 
 ---
 
-## WRITING STYLE
+## STYLE RULES
 
-✅ DO:
-- **CRITICAL: Use double line breaks between all paragraphs**
-- Short paragraphs (1-3 sentences max)
-- Active voice ("I learned" not "It was learned")
-- Concrete examples with numbers
-- White space is your friend - use it generously
-- Bold for key terms (sparingly)
-
-❌ DON'T:
-- Throat-clearing ("In today's newsletter...")
-- Vague language ("many people", "often")
-- Corporate speak ("leverage", "synergies")
-- Walls of text
-- Generic endings ("That's all for today!")
+- Write conversationally, like explaining to a smart friend
+- Use concrete numbers and specific examples
+- Bold **key terms** sparingly for emphasis
+- NO corporate jargon (leverage, synergies, etc.)
+- NO generic openings ("In today's newsletter...")
+- Target 600-1000 words total
 
 ---
 
-Now transform the content into an elite newsletter. Output in Markdown format:`;
+NOW OUTPUT THE NEWSLETTER IN THE EXACT FORMAT SHOWN ABOVE:`;
+}
+
+/**
+ * Post-process the newsletter content to ensure proper formatting.
+ * This fixes common AI output issues.
+ */
+function formatNewsletterContent(content: string): string {
+  let formatted = content;
+  
+  // Ensure headers have proper spacing (two blank lines before ##)
+  formatted = formatted.replace(/\n*(##\s)/g, '\n\n\n$1');
+  
+  // Ensure there's a blank line after headers
+  formatted = formatted.replace(/(##[^\n]+)\n([^\n])/g, '$1\n\n$2');
+  
+  // Add spacing around horizontal rules
+  formatted = formatted.replace(/\n*---\n*/g, '\n\n---\n\n');
+  
+  // Ensure bullet points have spacing
+  formatted = formatted.replace(/\n*(-\s[^\n]+)\n(-\s)/g, '\n$1\n\n$2');
+  
+  // Clean up excessive blank lines (more than 3)
+  formatted = formatted.replace(/\n{4,}/g, '\n\n\n');
+  
+  // Trim leading/trailing whitespace
+  formatted = formatted.trim();
+  
+  return formatted;
 }
 
 /**
@@ -214,13 +232,16 @@ async function generateNewsletterFromAI(
     throw new Error("Invalid response from Gemini API for newsletter generation");
   }
 
-  const newsletterContent = result.candidates[0].content.parts[0].text || "";
+  let newsletterContent = result.candidates[0].content.parts[0].text || "";
 
   if (!newsletterContent || newsletterContent.length < MIN_NEWSLETTER_LENGTH) {
     throw new Error(
       `Generated newsletter is too short: ${newsletterContent?.length || 0} characters`
     );
   }
+
+  // Post-process to ensure proper formatting
+  newsletterContent = formatNewsletterContent(newsletterContent);
 
   console.log(`✅ Newsletter generated: ${newsletterContent.length} characters`);
 

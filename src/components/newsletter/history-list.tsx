@@ -5,7 +5,6 @@ import Link from "next/link";
 import { Copy, Check, Trash2, ExternalLink, FileText, ChevronDown } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import remarkBreaks from "remark-breaks";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { deleteNewsletter } from "@/server/newsletters";
@@ -110,16 +109,49 @@ export function HistoryList({ newsletters: initialNewsletters }: HistoryListProp
                   {getPreview(newsletter.content)}
                 </p>
               ) : (
-                <div className="rounded-lg border bg-muted/30 p-6 sm:p-10 max-h-[600px] overflow-y-auto">
-                  <article className="prose prose-sm sm:prose-base max-w-none dark:prose-invert 
-                    prose-headings:font-semibold prose-headings:tracking-tight prose-headings:mt-10 prose-headings:mb-6 
-                    prose-p:my-6 prose-p:leading-loose 
-                    prose-strong:font-semibold 
-                    prose-ul:my-6 prose-ul:list-disc prose-ul:pl-6 prose-ul:marker:text-primary 
-                    prose-li:my-3 prose-li:leading-relaxed 
-                    prose-hr:my-10 prose-hr:border-border
-                    prose-blockquote:border-l-4 prose-blockquote:border-primary/50 prose-blockquote:pl-6 prose-blockquote:italic">
-                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]}>
+                <div className="rounded-lg border bg-white dark:bg-zinc-950 p-8 sm:p-10 max-h-[600px] overflow-y-auto">
+                  <article className="newsletter-content">
+                    <ReactMarkdown 
+                      remarkPlugins={[remarkGfm]}
+                      components={{
+                        h2: ({ children }) => (
+                          <h2 className="text-xl font-semibold mt-10 mb-4 text-foreground first:mt-0">
+                            {children}
+                          </h2>
+                        ),
+                        h3: ({ children }) => (
+                          <h3 className="text-lg font-medium mt-8 mb-3 text-foreground">
+                            {children}
+                          </h3>
+                        ),
+                        p: ({ children }) => (
+                          <p className="text-base leading-relaxed text-foreground/90 mb-6">
+                            {children}
+                          </p>
+                        ),
+                        ul: ({ children }) => (
+                          <ul className="list-disc pl-6 my-6 space-y-3">
+                            {children}
+                          </ul>
+                        ),
+                        li: ({ children }) => (
+                          <li className="text-base leading-relaxed text-foreground/90">
+                            {children}
+                          </li>
+                        ),
+                        strong: ({ children }) => (
+                          <strong className="font-semibold text-foreground">
+                            {children}
+                          </strong>
+                        ),
+                        em: ({ children }) => (
+                          <em className="italic">{children}</em>
+                        ),
+                        hr: () => (
+                          <hr className="my-8 border-border" />
+                        ),
+                      }}
+                    >
                       {newsletter.content}
                     </ReactMarkdown>
                   </article>
