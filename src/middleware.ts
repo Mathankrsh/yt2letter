@@ -2,7 +2,8 @@ import { NextResponse, type NextRequest } from "next/server";
 import { betterFetch } from "@better-fetch/fetch";
 
 // Routes that require authentication
-const PROTECTED_ROUTES = ["/dashboard"];
+const PROTECTED_ROUTES = ["/dashboard", "/history"];
+
 
 // Routes that should redirect to dashboard if already logged in
 const AUTH_ROUTES = ["/login", "/signup"];
