@@ -2,11 +2,11 @@
 
 import { useState } from "react";
 import { Loader2, Copy, Check, Sparkles, Youtube } from "lucide-react";
+import ReactMarkdown from "react-markdown";
 import { generateNewsletter } from "@/server/ai";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardAction } from "@/components/ui/card";
 
 export function NewsletterGenerator() {
   const [youtubeUrl, setYoutubeUrl] = useState("");
@@ -62,117 +62,95 @@ export function NewsletterGenerator() {
   return (
     <div className="space-y-8">
       {/* Hero Section */}
-      <div className="text-center space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight">
-          YouTube to Newsletter
+      <div className="text-center space-y-3">
+        <h1 className="text-3xl font-semibold tracking-tight text-primary">
+          What are we creating today?
         </h1>
-        <p className="text-muted-foreground max-w-md mx-auto">
-          Transform any YouTube video into an engaging email newsletter in seconds.
-        </p>
       </div>
 
       {/* Input Section */}
-      <Card className="border-2 shadow-lg">
-        <CardHeader className="pb-4">
-          <div className="flex items-center gap-3">
-            <div className="rounded-lg bg-primary/10 p-2">
-              <Youtube className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <CardTitle className="text-lg">Paste Video URL</CardTitle>
-              <CardDescription>
-                Enter a YouTube video URL to convert
-              </CardDescription>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleGenerate} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="youtube-url" className="sr-only">YouTube Video URL</Label>
-              <Input
-                id="youtube-url"
-                type="url"
-                placeholder="https://www.youtube.com/watch?v=..."
-                value={youtubeUrl}
-                onChange={(e) => setYoutubeUrl(e.target.value)}
-                disabled={isGenerating}
-                required
-                className="h-12 text-base border-2 focus:border-primary"
-              />
-            </div>
-
-            {error && (
-              <div className="rounded-lg bg-destructive/10 border border-destructive/20 p-4 text-sm text-destructive">
-                <p className="font-medium">Error</p>
-                <p className="mt-1 opacity-90">{error}</p>
-              </div>
-            )}
-
+      <div className="flex flex-col items-center gap-4">
+        <form onSubmit={handleGenerate} className="w-full max-w-xl">
+          <div className="flex gap-2 items-center p-1 rounded-full border shadow-sm bg-background">
+            <Input
+              type="url"
+              placeholder="Paste YouTube URL here..."
+              value={youtubeUrl}
+              onChange={(e) => setYoutubeUrl(e.target.value)}
+              disabled={isGenerating}
+              required
+              className="flex-1 border-0 shadow-none focus-visible:ring-0 bg-transparent h-10 px-4"
+            />
             <Button
               type="submit"
-              className="w-full h-12 text-base font-semibold"
+              size="default"
               disabled={isGenerating || !isValidYoutubeUrl(youtubeUrl)}
+              className="rounded-full px-6"
             >
               {isGenerating ? (
-                <>
-                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                  Generating Newsletter...
-                </>
+                <Loader2 className="size-4 animate-spin" />
               ) : (
-                <>
-                  <Sparkles className="mr-2 h-5 w-5" />
-                  Generate Newsletter
-                </>
+                "Generate"
               )}
             </Button>
+          </div>
+        </form>
 
-            {isGenerating && (
-              <p className="text-center text-sm text-muted-foreground">
-                This may take up to a minute depending on video length
-              </p>
-            )}
-          </form>
-        </CardContent>
-      </Card>
+        {isGenerating && (
+          <p className="text-sm text-muted-foreground animate-pulse">
+            Generating your newsletter... This may take up to a minute.
+          </p>
+        )}
+
+        {error && (
+          <div className="w-full max-w-xl rounded-lg bg-destructive/10 border border-destructive/20 p-4 text-sm text-destructive">
+            <p className="font-medium">Error</p>
+            <p className="mt-1 opacity-90">{error}</p>
+          </div>
+        )}
+      </div>
 
       {/* Output Section */}
       {newsletter && (
-        <Card className="border-2 shadow-lg">
-          <CardHeader className="flex flex-row items-start justify-between gap-4 pb-4">
-            <div className="space-y-1">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Check className="h-5 w-5 text-primary" />
-                Newsletter Generated
-              </CardTitle>
-              <CardDescription className="line-clamp-1">
-                From: {newsletter.videoTitle}
-              </CardDescription>
+        <Card className="max-w-3xl mx-auto">
+          <CardHeader>
+            <div className="flex items-start justify-between gap-4">
+              <div className="space-y-1.5">
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <Check className="size-5 text-primary" />
+                  Newsletter Generated
+                </CardTitle>
+                <CardDescription className="line-clamp-2">
+                  From: {newsletter.videoTitle}
+                </CardDescription>
+              </div>
+              <CardAction>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleCopy}
+                  className="shrink-0"
+                >
+                  {copied ? (
+                    <>
+                      <Check className="size-4 text-primary" />
+                      Copied!
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="size-4" />
+                      Copy
+                    </>
+                  )}
+                </Button>
+              </CardAction>
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleCopy}
-              className="shrink-0 border-2"
-            >
-              {copied ? (
-                <>
-                  <Check className="mr-2 h-4 w-4 text-primary" />
-                  Copied!
-                </>
-              ) : (
-                <>
-                  <Copy className="mr-2 h-4 w-4" />
-                  Copy
-                </>
-              )}
-            </Button>
           </CardHeader>
           <CardContent>
-            <div className="max-h-[500px] overflow-y-auto rounded-lg border-2 bg-muted/30 p-6">
-              <pre className="whitespace-pre-wrap font-sans text-sm leading-relaxed text-foreground">
-                {newsletter.content}
-              </pre>
+            <div className="max-h-[600px] overflow-y-auto rounded-lg border bg-muted/30 p-6">
+              <div className="prose prose-sm max-w-none dark:prose-invert prose-headings:font-semibold prose-headings:tracking-tight prose-p:leading-relaxed prose-strong:font-semibold prose-ul:my-2 prose-li:my-0">
+                <ReactMarkdown>{newsletter.content}</ReactMarkdown>
+              </div>
             </div>
           </CardContent>
         </Card>

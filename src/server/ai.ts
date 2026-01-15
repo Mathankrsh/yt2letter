@@ -73,15 +73,25 @@ Now rewrite the transcript above:`;
 }
 
 /**
- * Create prompt for generating newsletter from rewritten content.
- * Using thread-style prompt as base (will be updated with dedicated newsletter prompt later).
+ * Elite newsletter prompt - generates high-value, actionable newsletters.
  */
 function createNewsletterPrompt(videoData: any, rewrittenContent: string): string {
   const durationMinutes = Math.floor(
     Number.parseInt(videoData.duration, 10) / SECONDS_PER_MINUTE
   );
 
-  return `Generate an engaging email newsletter based on this YouTube video content:
+  return `You are an elite newsletter writer who transforms raw content into compelling, high-value newsletters that readers eagerly anticipate. Your writing synthesizes the best qualities of world-class newsletter writers: the tactical depth of Lenny Rachitsky, the wisdom density of James Clear, the clarity of Sahil Bloom, the philosophical insight of Naval Ravikant, and the analytical storytelling of Packy McCormick.
+
+## YOUR CORE MISSION
+
+Transform the provided content into a newsletter that:
+- Readers would pay money to receive
+- Gets forwarded to colleagues and friends
+- Provides immediate, actionable value
+- Respects every second of reader time
+- Makes complex ideas simple and memorable
+
+---
 
 **Video Information:**
 - Title: ${videoData.title}
@@ -93,65 +103,63 @@ ${rewrittenContent}
 
 ---
 
-## NEWSLETTER GENERATION RULES
+## CRITICAL OUTPUT RULES
 
-**TARGET LENGTH:** 800-1500 words (optimal for email newsletters)
+1. **FORMAT**: Output in clean Markdown format with proper headers (##, ###), bold (**text**), and bullet points (-)
+2. **HOOK**: Start with 1-3 sentences that grab attention immediately - NO generic openings
+3. **LENGTH**: 600-1000 words - cut ruthlessly, every sentence must earn its place
+4. **VOICE**: Write like explaining to a smart friend over coffee - conversational but authoritative
+5. **SPECIFICS**: Use concrete numbers, names, and examples - never vague language
 
-**CONTENT RULES:**
-- Write in first person (I, my, me) as if the video creator is sharing insights
-- Use 90-95% of key ideas/phrases from the content
-- Personal, conversational tone that feels like a friend sharing knowledge
-- Make it scannable with clear sections
-- Include actionable takeaways
+## NEWSLETTER STRUCTURE
 
-**STRUCTURE:**
-
-1. **Subject Line Suggestion** - Compelling, curiosity-driven (under 50 chars)
-2. **Opening Hook** (2-3 sentences) - Personal story or striking statement
-3. **Main Insight** (The core value) - What the video teaches
-4. **Key Takeaways** - 3-5 bullet points of actionable advice
-5. **Personal Reflection** - What this means for the reader
-6. **Sign Off** - Warm, personal closing
-
-**FORMATTING RULES:**
-- Use plain text (NO HTML tags)
-- Use **bold** for emphasis sparingly
-- Use bullet points with - or • characters
-- Separate sections with blank lines
-- Keep paragraphs short (2-3 sentences max)
+**Subject Line:** [6-10 words, creates curiosity, promises specific value]
 
 ---
 
-## EXAMPLE OUTPUT FORMAT:
+[HOOK - 1-3 punchy sentences that grab attention]
 
-**Subject Line:** The one habit that changed everything
+[CONTEXT - 2-4 sentences on why this matters NOW]
 
----
+## [Descriptive Subhead 1]
 
-Hey there,
+[Core insight with specific example - 3-5 sentences]
 
-I just watched something that completely shifted how I think about [topic].
+## [Descriptive Subhead 2]
 
-Most people believe [common misconception]. But here's what I learned...
+[More insights with specifics - 3-5 sentences or bullets]
 
-[Main insight paragraphs here]
+## [Descriptive Subhead 3]
 
-**Here's what I'm taking away from this:**
+[Continue pattern - 3-5 sentences or bullets]
 
-- First actionable takeaway
-- Second actionable takeaway  
-- Third actionable takeaway
+## Key Takeaways
 
-This really made me reflect on [personal connection].
-
-Until next time,
-[Author name]
+- [Specific, actionable insight 1]
+- [Specific, actionable insight 2]
+- [Specific, actionable insight 3]
 
 ---
 
-⚠️ IMPORTANT: Output plain text only. No HTML. No markdown code blocks. Just the newsletter content.
+## WRITING STYLE
 
-Now generate the newsletter:`;
+✅ DO:
+- Short sentences (10-20 words average)
+- Active voice ("I learned" not "It was learned")
+- Concrete examples with numbers
+- White space and short paragraphs
+- Bold for key terms (sparingly)
+
+❌ DON'T:
+- Throat-clearing ("In today's newsletter...")
+- Vague language ("many people", "often")
+- Corporate speak ("leverage", "synergies")
+- Walls of text
+- Generic endings ("That's all for today!")
+
+---
+
+Now transform the content into an elite newsletter. Output in Markdown format:`;
 }
 
 /**
