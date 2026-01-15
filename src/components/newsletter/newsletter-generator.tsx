@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { Loader2, Copy, Check, Sparkles, Youtube } from "lucide-react";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import remarkBreaks from "remark-breaks";
 import { generateNewsletter } from "@/server/ai";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -147,9 +149,11 @@ export function NewsletterGenerator() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="max-h-[600px] overflow-y-auto rounded-lg border bg-muted/30 p-6">
-              <div className="prose prose-sm max-w-none dark:prose-invert prose-headings:font-semibold prose-headings:tracking-tight prose-p:leading-relaxed prose-strong:font-semibold prose-ul:my-2 prose-li:my-0">
-                <ReactMarkdown>{newsletter.content}</ReactMarkdown>
+            <div className="max-h-[600px] overflow-y-auto rounded-lg border bg-muted/30 p-6 sm:p-8">
+              <div className="prose prose-sm sm:prose-base max-w-none dark:prose-invert prose-headings:font-semibold prose-headings:tracking-tight prose-headings:mt-8 prose-headings:mb-4 prose-p:my-4 prose-p:leading-relaxed prose-strong:font-semibold prose-ul:my-4 prose-ul:list-disc prose-ul:pl-6 prose-li:my-2 prose-hr:my-8 prose-blockquote:border-l-4 prose-blockquote:border-primary/50 prose-blockquote:pl-4 prose-blockquote:italic">
+                <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]}>
+                  {newsletter.content}
+                </ReactMarkdown>
               </div>
             </div>
           </CardContent>

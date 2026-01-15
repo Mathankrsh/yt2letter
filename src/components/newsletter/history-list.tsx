@@ -4,6 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { Copy, Check, Trash2, ExternalLink, FileText, ChevronDown } from "lucide-react";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import remarkBreaks from "remark-breaks";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { deleteNewsletter } from "@/server/newsletters";
@@ -109,8 +111,10 @@ export function HistoryList({ newsletters: initialNewsletters }: HistoryListProp
                 </p>
               ) : (
                 <div className="rounded-lg border bg-muted/30 p-6 max-h-[500px] overflow-y-auto">
-                  <article className="prose prose-sm max-w-none dark:prose-invert prose-headings:font-semibold prose-headings:tracking-tight prose-headings:mt-6 prose-headings:mb-3 prose-p:my-3 prose-p:leading-relaxed prose-strong:font-semibold prose-ul:my-3 prose-ul:pl-5 prose-li:my-1 prose-hr:my-6">
-                    <ReactMarkdown>{newsletter.content}</ReactMarkdown>
+                  <article className="prose prose-sm max-w-none dark:prose-invert prose-headings:font-semibold prose-headings:tracking-tight prose-headings:mt-6 prose-headings:mb-3 prose-p:my-3 prose-p:leading-relaxed prose-strong:font-semibold prose-ul:my-3 prose-ul:list-disc prose-ul:pl-5 prose-li:my-1 prose-hr:my-6">
+                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]}>
+                      {newsletter.content}
+                    </ReactMarkdown>
                   </article>
                 </div>
               )}
