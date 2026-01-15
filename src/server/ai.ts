@@ -144,10 +144,11 @@ ${rewrittenContent}
 ## WRITING STYLE
 
 ✅ DO:
-- Short sentences (10-20 words average)
+- **CRITICAL: Use double line breaks between all paragraphs**
+- Short paragraphs (1-3 sentences max)
 - Active voice ("I learned" not "It was learned")
 - Concrete examples with numbers
-- White space and short paragraphs
+- White space is your friend - use it generously
 - Bold for key terms (sparingly)
 
 ❌ DON'T:

@@ -110,8 +110,15 @@ export function HistoryList({ newsletters: initialNewsletters }: HistoryListProp
                   {getPreview(newsletter.content)}
                 </p>
               ) : (
-                <div className="rounded-lg border bg-muted/30 p-6 max-h-[500px] overflow-y-auto">
-                  <article className="prose prose-sm max-w-none dark:prose-invert prose-headings:font-semibold prose-headings:tracking-tight prose-headings:mt-6 prose-headings:mb-3 prose-p:my-3 prose-p:leading-relaxed prose-strong:font-semibold prose-ul:my-3 prose-ul:list-disc prose-ul:pl-5 prose-li:my-1 prose-hr:my-6">
+                <div className="rounded-lg border bg-muted/30 p-6 sm:p-10 max-h-[600px] overflow-y-auto">
+                  <article className="prose prose-sm sm:prose-base max-w-none dark:prose-invert 
+                    prose-headings:font-semibold prose-headings:tracking-tight prose-headings:mt-10 prose-headings:mb-6 
+                    prose-p:my-6 prose-p:leading-loose 
+                    prose-strong:font-semibold 
+                    prose-ul:my-6 prose-ul:list-disc prose-ul:pl-6 prose-ul:marker:text-primary 
+                    prose-li:my-3 prose-li:leading-relaxed 
+                    prose-hr:my-10 prose-hr:border-border
+                    prose-blockquote:border-l-4 prose-blockquote:border-primary/50 prose-blockquote:pl-6 prose-blockquote:italic">
                     <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]}>
                       {newsletter.content}
                     </ReactMarkdown>

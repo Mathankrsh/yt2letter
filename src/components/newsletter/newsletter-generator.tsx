@@ -149,8 +149,15 @@ export function NewsletterGenerator() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="max-h-[600px] overflow-y-auto rounded-lg border bg-muted/30 p-6 sm:p-8">
-              <div className="prose prose-sm sm:prose-base max-w-none dark:prose-invert prose-headings:font-semibold prose-headings:tracking-tight prose-headings:mt-8 prose-headings:mb-4 prose-p:my-4 prose-p:leading-relaxed prose-strong:font-semibold prose-ul:my-4 prose-ul:list-disc prose-ul:pl-6 prose-li:my-2 prose-hr:my-8 prose-blockquote:border-l-4 prose-blockquote:border-primary/50 prose-blockquote:pl-4 prose-blockquote:italic">
+            <div className="max-h-[600px] overflow-y-auto rounded-lg border bg-muted/30 p-6 sm:p-10">
+              <div className="prose prose-sm sm:prose-base max-w-none dark:prose-invert 
+                  prose-headings:font-semibold prose-headings:tracking-tight prose-headings:mt-10 prose-headings:mb-6 
+                  prose-p:my-6 prose-p:leading-loose 
+                  prose-strong:font-semibold 
+                  prose-ul:my-6 prose-ul:list-disc prose-ul:pl-6 prose-ul:marker:text-primary 
+                  prose-li:my-3 prose-li:leading-relaxed 
+                  prose-hr:my-10 prose-hr:border-border
+                  prose-blockquote:border-l-4 prose-blockquote:border-primary/50 prose-blockquote:pl-6 prose-blockquote:italic">
                 <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]}>
                   {newsletter.content}
                 </ReactMarkdown>
