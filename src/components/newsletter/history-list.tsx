@@ -2,16 +2,31 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { formatDistanceToNow } from "date-fns";
-import { Copy, Check, Trash2, ExternalLink, FileText } from "lucide-react";
+import { Copy, Check, Trash2, ExternalLink, FileText, ChevronDown } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardAction } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { deleteNewsletter } from "@/server/newsletters";
 import type { NewsletterItem } from "@/server/newsletters";
 
 interface HistoryListProps {
   newsletters: NewsletterItem[];
+}
+
+const MAX_PREVIEW_LENGTH = 150;
+
+function getPreview(content: string): string {
+  // Remove markdown formatting for preview
+  const plain = content
+    .replace(/#{1,6}\s+/g, "")
+    .replace(/\*\*/g, "")
+    .replace(/\*/g, "")
+    .replace(/\n+/g, " ")
+    .trim();
+  
+  return plain.length > MAX_PREVIEW_LENGTH
+    ? `${plain.substring(0, MAX_PREVIEW_LENGTH)}...`
+    : plain;
 }
 
 export function HistoryList({ newsletters: initialNewsletters }: HistoryListProps) {
@@ -52,106 +67,114 @@ export function HistoryList({ newsletters: initialNewsletters }: HistoryListProp
 
   if (newsletters.length === 0) {
     return (
-      <Card>
-        <CardContent className="flex flex-col items-center justify-center py-12">
-          <FileText className="size-12 text-muted-foreground/50 mb-4" />
-          <h3 className="text-lg font-medium">No newsletters yet</h3>
-          <p className="text-muted-foreground text-sm mt-1 mb-4">
-            Generate your first newsletter from a YouTube video
-          </p>
-          <Button asChild>
-            <Link href="/dashboard">Create Newsletter</Link>
-          </Button>
-        </CardContent>
-      </Card>
+      <div className="text-center py-16">
+        <FileText className="size-12 text-muted-foreground/30 mx-auto mb-4" />
+        <h3 className="text-lg font-medium text-muted-foreground">
+          No newsletters yet
+        </h3>
+        <p className="text-sm text-muted-foreground mt-2">
+          Start by generating content from a YouTube video.
+        </p>
+        <Link href="/dashboard" className="inline-block mt-6">
+          <Button>Create Newsletter</Button>
+        </Link>
+      </div>
     );
   }
 
   return (
     <div className="space-y-4">
-      {newsletters.map((newsletter) => (
-        <Card key={newsletter.id}>
-          <CardHeader>
-            <div className="flex items-start justify-between gap-4">
-              <div className="space-y-1 min-w-0 flex-1">
-                <CardTitle className="text-base line-clamp-1">
-                  {newsletter.videoTitle}
-                </CardTitle>
-                <CardDescription className="flex items-center gap-2 text-xs">
-                  <span>{newsletter.videoAuthor}</span>
-                  <span>•</span>
-                  <span>
-                    {formatDistanceToNow(new Date(newsletter.createdAt), {
-                      addSuffix: true,
-                    })}
-                  </span>
-                </CardDescription>
+      {newsletters.map((newsletter) => {
+        const isExpanded = expandedId === newsletter.id;
+        
+        return (
+          <Card key={newsletter.id}>
+            <CardHeader>
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex-1 min-w-0">
+                  <CardTitle className="text-lg leading-snug">
+                    {newsletter.videoTitle}
+                  </CardTitle>
+                  <CardDescription className="mt-1">
+                    By {newsletter.videoAuthor} • YouTube ID: {newsletter.videoId}
+                  </CardDescription>
+                </div>
               </div>
-              <CardAction>
-                <div className="flex items-center gap-1">
+            </CardHeader>
+            
+            <CardContent>
+              {!isExpanded ? (
+                <p className="text-muted-foreground text-sm">
+                  {getPreview(newsletter.content)}
+                </p>
+              ) : (
+                <div className="rounded-lg border bg-muted/30 p-6 max-h-[500px] overflow-y-auto">
+                  <article className="prose prose-sm max-w-none dark:prose-invert prose-headings:font-semibold prose-headings:tracking-tight prose-headings:mt-6 prose-headings:mb-3 prose-p:my-3 prose-p:leading-relaxed prose-strong:font-semibold prose-ul:my-3 prose-ul:pl-5 prose-li:my-1 prose-hr:my-6">
+                    <ReactMarkdown>{newsletter.content}</ReactMarkdown>
+                  </article>
+                </div>
+              )}
+            </CardContent>
+            
+            <CardFooter>
+              <div className="flex items-center justify-between w-full">
+                <p className="text-muted-foreground text-xs">
+                  Created: {new Date(newsletter.createdAt).toLocaleDateString()}
+                </p>
+                <div className="flex items-center gap-2">
                   <Button
                     variant="ghost"
-                    size="icon-sm"
+                    size="sm"
                     onClick={() => handleCopy(newsletter.content, newsletter.id)}
-                    title="Copy content"
+                    className="text-muted-foreground"
                   >
                     {copiedId === newsletter.id ? (
-                      <Check className="size-4 text-primary" />
+                      <>
+                        <Check className="size-4 text-primary mr-1" />
+                        Copied
+                      </>
                     ) : (
-                      <Copy className="size-4" />
+                      <>
+                        <Copy className="size-4 mr-1" />
+                        Copy
+                      </>
                     )}
                   </Button>
                   <Button
                     variant="ghost"
-                    size="icon-sm"
+                    size="sm"
                     asChild
-                    title="View on YouTube"
+                    className="text-muted-foreground"
                   >
                     <a
                       href={`https://youtube.com/watch?v=${newsletter.videoId}`}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      <ExternalLink className="size-4" />
+                      <ExternalLink className="size-4 mr-1" />
+                      YouTube
                     </a>
                   </Button>
                   <Button
                     variant="ghost"
-                    size="icon-sm"
+                    size="sm"
                     onClick={() => handleDelete(newsletter.id)}
                     disabled={deletingId === newsletter.id}
-                    title="Delete"
                     className="text-muted-foreground hover:text-destructive"
                   >
-                    <Trash2 className="size-4" />
+                    <Trash2 className="size-4 mr-1" />
+                    Delete
+                  </Button>
+                  <Button onClick={() => toggleExpand(newsletter.id)}>
+                    {isExpanded ? "Hide Content" : "View Content"}
+                    <ChevronDown className={`size-4 ml-1 transition-transform ${isExpanded ? "rotate-180" : ""}`} />
                   </Button>
                 </div>
-              </CardAction>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div
-              className={`overflow-hidden transition-all duration-200 ${
-                expandedId === newsletter.id ? "max-h-[600px]" : "max-h-24"
-              }`}
-            >
-              <div className="rounded-lg border bg-muted/30 p-4">
-                <div className="prose prose-sm max-w-none dark:prose-invert prose-headings:font-semibold prose-headings:tracking-tight prose-p:leading-relaxed prose-strong:font-semibold prose-ul:my-2 prose-li:my-0">
-                  <ReactMarkdown>{newsletter.content}</ReactMarkdown>
-                </div>
               </div>
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => toggleExpand(newsletter.id)}
-              className="mt-2 w-full text-muted-foreground"
-            >
-              {expandedId === newsletter.id ? "Show less" : "Show more"}
-            </Button>
-          </CardContent>
-        </Card>
-      ))}
+            </CardFooter>
+          </Card>
+        );
+      })}
     </div>
   );
 }
